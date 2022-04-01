@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using DogGo.Models;
 using DogGo.Repositories;
+using System;
 
 namespace DogGo.Controllers
 {
@@ -20,7 +21,6 @@ namespace DogGo.Controllers
         public ActionResult Index()
         {
         List<Walker> walkers = _walkerRepo.GetAllWalkers();
-
         return View(walkers);
         }
 
