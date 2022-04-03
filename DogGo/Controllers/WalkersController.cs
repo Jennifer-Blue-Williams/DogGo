@@ -10,6 +10,7 @@ namespace DogGo.Controllers
     public class WalkersController : Controller
     {
         private readonly IWalkerRepository _walkerRepo;
+        private object walker;
 
         // ASP.NET will give us an instance of our Walker Repository. This is called "Dependency Injection"
         public WalkersController(IWalkerRepository walkerRepository)
@@ -61,7 +62,14 @@ namespace DogGo.Controllers
         // GET: WalkersController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Walker walker = _walkerRepo.GetWalkerById(id);
+
+            if (walker == null)
+            {
+                return NotFound();
+            }
+
+            return View(walker);
         }
 
         // POST: WalkersController/Edit/5
@@ -71,11 +79,13 @@ namespace DogGo.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _walkerRepo.UpdateWalker(walker);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return View(walker);
             }
         }
 

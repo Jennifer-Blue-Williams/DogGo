@@ -97,5 +97,10 @@ namespace DogGo.Repositories
                 }
             }
         }
+
+        public void UpdateWalker(object walker)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
