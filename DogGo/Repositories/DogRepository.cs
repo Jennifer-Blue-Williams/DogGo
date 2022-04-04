@@ -111,7 +111,7 @@ namespace DogGo.Repositories
                 SELECT Id, Name, Breed, Notes, ImageUrl, OwnerId 
                 FROM Dog
                 WHERE OwnerId = @ownerId
-            ";
+                ";
 
                     cmd.Parameters.AddWithValue("@ownerId", ownerId);
 
