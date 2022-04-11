@@ -1,16 +1,18 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using DogGo.Models;
 using DogGo.Repositories;
-using System;
+using DogGo.Models;
+using DogGo.Controllers;
+using System.Collections.Generic;
+using DogGo.Models.ViewModels;
+using System.Security.Claims;
 
 namespace DogGo.Controllers
 {
     public class WalkersController : Controller
     {
+        //private readonly IOwnerRepository _ownerRepo;
         private readonly IWalkerRepository _walkerRepo;
-        private object walker;
 
         // ASP.NET will give us an instance of our Walker Repository. This is called "Dependency Injection"
         public WalkersController(IWalkerRepository walkerRepository)
@@ -18,24 +20,42 @@ namespace DogGo.Controllers
             _walkerRepo = walkerRepository;
         }
 
+        //GET: Walkers
         // GET: Walkers
         public ActionResult Index()
         {
-        List<Walker> walkers = _walkerRepo.GetAllWalkers();
-        return View(walkers);
-        }
 
-        // GET: Walkers/Details/5
-        public ActionResult Details(int id)
-        {
-            Walker walker = _walkerRepo.GetWalkerById(id);
+            int currUserId = 0;
+            List<Walker> walkers = new List<Walker>();
 
-            if (walker == null)
+            if (User.FindFirstValue(ClaimTypes.NameIdentifier) != null)
             {
-                return NotFound();
+                currUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             }
 
-            return View(walker);
+
+            if (currUserId != 0)
+            {
+                walkers = _walkerRepo.GetAllWalkersInHoodByOwnerId(currUserId);
+            }
+            else
+            {
+                walkers = _walkerRepo.GetAllWalkers();
+            }
+
+            return View(walkers);
+        }
+
+
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (id == null)
+            { return -1; }
+            else
+            {
+                return int.Parse(id);
+            }
         }
 
         // GET: WalkersController/Create
@@ -79,13 +99,11 @@ namespace DogGo.Controllers
         {
             try
             {
-                _walkerRepo.UpdateWalker(walker);
-
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch
             {
-                return View(walker);
+                return View();
             }
         }
 

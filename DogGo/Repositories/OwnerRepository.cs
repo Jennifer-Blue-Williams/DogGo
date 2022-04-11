@@ -67,6 +67,7 @@ namespace DogGo.Repositories
 
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                        //Need to join neighborhood information
                     cmd.CommandText = @"
                         SELECT Id, [Name], Email, Address, Phone, NeighborhoodId
                         FROM Owner
@@ -76,22 +77,27 @@ namespace DogGo.Repositories
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        Owner owner = null;
+
+                        while (reader.Read())
                         {
-                            Owner owner = new Owner()
+                            if(owner == null)
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
-                                Email = reader.GetString(reader.GetOrdinal("Email")),
-                                Address = reader.GetString(reader.GetOrdinal("Address")),
-                                Phone = reader.GetString(reader.GetOrdinal("Phone")),
-                                NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId"))
-                            };
-
-                            return owner;
+                                owner = new Owner()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                                    Address = reader.GetString(reader.GetOrdinal("Address")),
+                                    Phone = reader.GetString(reader.GetOrdinal("Phone")),
+                                    //Create an instance of neighborhood object neighborhood = new Neighborhood() and instantiate it
+                                    NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId"))
+                                };
+                            }
+                            
                         }
+                            return owner;
 
-                        return null;
                     }
                 }
             }
